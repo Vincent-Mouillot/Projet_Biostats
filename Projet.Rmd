@@ -1,0 +1,69 @@
+---
+title: "Projet"
+author: "Vincent Mouillot  & Inès Rouached"
+date: "20/12/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(readxl)
+library(tidyverse)
+Intoxications <- read_excel("Intoxications.xls")
+View(Intoxications)
+Intoxications <- read_excel("Intoxications.xls")
+Intoxications <- read_excel("Intoxications.xls") %>%
+  rename("Nausee"=`Nausée ?`,
+         "Vomi" = `Vomissements ?`,
+         "Diarrhee" = Diarrée,
+         "Eclair" = eclair,
+         "Sexe" = sex) %>%
+  mutate(Sexe = as.factor(Sexe),
+         Nausee = as.factor(Nausee),
+         Vomi = as.factor(Vomi),
+         Douleur = as.factor(Douleur),
+         Diarrhee = as.factor(Diarrhee),
+         Eclair = as.numeric(Eclair),
+         Boeuf = as.factor(Boeuf),
+         Oeuf = as.factor(Oeuf),
+         Eau = as.factor(Eau),
+         fcEclair = as.factor(Eclair))
+
+summary(Intoxications)
+
+levels(Intoxications$fcEclair)
+
+```
+### Introduction
+
+L’étude réalisée ici traite des individus ayant eu une intoxication alimentaire, en Inde en 1990, après une grande manifestation. Pour cela, les habitudes alimentaires sur une cohorte de ces individus ont été répertoriées. Suivant la problématique posée, différentes approches (méthodes) apprises en cours de biostatistique seront mises en avant.
+L’objectif principal sera de construire de potentiels modèle qui permettent d’expliquer et de constater les liens statistiques qui peuvent exister.
+
+### I.	Statistiques descriptives
+
+Dans ce projet nous allons travailler sur une table de données qui rend compte de l’occurrence d'intoxications alimentaires, suivie sur une cohorte d’individus. Ces individus ont répondu à une enquête sur les habitudes alimentaires.
+Notre table comporte 1094 individus et 11 variables.
+Parmis ces 11 variables, nous avons 9 variables qualitatives et 2 variables quantitatives.
+
+Variables quantitatives :
+
+id : identifiant
+Age : l'âge en années
+
+
+Variables qualitatives :
+
+sex : Sexe, 0 : femme/ 1 : Homme 
+Boeuf : le sujet a-t-il mangé du boeuf au curry lors de l'événement ? 1 : Oui / 2 : Non
+Oeuf : le sujet a-t-il mangé des oeufs frits lors de l'événement ? 1 : Oui / 2 : Non
+Eau : le sujet a-t-il bu de l'eau distribuée ce jour là ? 1 : Oui / 2 : Non
+Eclair : combien d'éclairs l'individu a mangé ce jour là. Les valeurs 80 et 90 correspondent respectivement à "a mangé des éclair sans se souvenir combien" et "donnée manquante".
+
+Viennent ensuite les variables de symptôme : nausée, vomissement, douleur (abdominale) et diarrée, constatés chez l'individu. Les symptômes constatés ont été codés de la façon suivante :
+0 : pas de symtôme / 1 : symptôme / 99 : non renseigné.
+
+###
+
