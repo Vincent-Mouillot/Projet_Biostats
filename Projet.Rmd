@@ -25,7 +25,7 @@ Intoxications <- read_excel("Intoxications.xls") %>%
          Nausee = as.factor(Nausee),
          Vomi = as.factor(Vomi),
          Douleur = as.factor(Douleur),
-         Diarrhee = as.factor(Diarrhee),
+         Diarrhee = as.factor(Diarrhee), 
          Eclair = as.numeric(Eclair),
          Boeuf = as.factor(Boeuf),
          Oeuf = as.factor(Oeuf),
