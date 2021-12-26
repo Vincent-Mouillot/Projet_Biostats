@@ -17,7 +17,7 @@ View(Intoxications)
 Intoxications <- read_excel("Intoxications.xls")
 Intoxications <- read_excel("Intoxications.xls") %>%
   rename("Nausee"=`Nausée ?`,
-         "Vomi" = `Vomissements ?`,
+         "Vomi" = `Vomissements ?`, 
          "Diarrhee" = Diarrée,
          "Eclair" = eclair,
          "Sexe" = sex) %>%
