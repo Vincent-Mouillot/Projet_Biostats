@@ -56,7 +56,7 @@ Age : l'âge en années
 
 Variables qualitatives :
 
-sex : Sexe, 0 : femme/ 1 : Homme 
+sex : Sexe, 0 : femme/ 1 : Homme
 Boeuf : le sujet a-t-il mangé du boeuf au curry lors de l'événement ? 1 : Oui / 2 : Non
 Oeuf : le sujet a-t-il mangé des oeufs frits lors de l'événement ? 1 : Oui / 2 : Non
 Eau : le sujet a-t-il bu de l'eau distribuée ce jour là ? 1 : Oui / 2 : Non
