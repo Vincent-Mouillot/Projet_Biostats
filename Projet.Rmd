@@ -2,19 +2,22 @@
 title: "Projet"
 author: "Vincent Mouillot  & Inès Rouached"
 date: "20/12/2021"
-output: html_document
+output: 
+  pdf_document: 
+    toc: yes
+    number_sections: yes
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-```
 
-```{r}
 library(readxl)
 library(tidyverse)
-Intoxications <- read_excel("Intoxications.xls")
-View(Intoxications)
-Intoxications <- read_excel("Intoxications.xls")
+```
+
+\newpage
+
+```{r, echo=FALSE}
 Intoxications <- read_excel("Intoxications.xls") %>%
   rename("Nausee"=`Nausée ?`,
          "Vomi" = `Vomissements ?`, 
@@ -30,19 +33,20 @@ Intoxications <- read_excel("Intoxications.xls") %>%
          Boeuf = as.factor(Boeuf),
          Oeuf = as.factor(Oeuf),
          Eau = as.factor(Eau),
-         fcEclair = as.factor(Eclair))
-
-summary(Intoxications)
-
-levels(Intoxications$fcEclair)
-
+         FactEclair = as.factor(Eclair))
 ```
-### Introduction
+
+# Introduction
 
 L’étude réalisée ici traite des individus ayant eu une intoxication alimentaire, en Inde en 1990, après une grande manifestation. Pour cela, les habitudes alimentaires sur une cohorte de ces individus ont été répertoriées. Suivant la problématique posée, différentes approches (méthodes) apprises en cours de biostatistique seront mises en avant.
 L’objectif principal sera de construire de potentiels modèle qui permettent d’expliquer et de constater les liens statistiques qui peuvent exister.
 
-### I.	Statistiques descriptives
+```{r, echo=FALSE}
+summary(Intoxications)
+```
+
+
+# Statistiques descriptives
 
 Dans ce projet nous allons travailler sur une table de données qui rend compte de l’occurrence d'intoxications alimentaires, suivie sur une cohorte d’individus. Ces individus ont répondu à une enquête sur les habitudes alimentaires.
 Notre table comporte 1094 individus et 11 variables.
@@ -65,5 +69,5 @@ Eclair : combien d'éclairs l'individu a mangé ce jour là. Les valeurs 80 et 9
 Viennent ensuite les variables de symptôme : nausée, vomissement, douleur (abdominale) et diarrée, constatés chez l'individu. Les symptômes constatés ont été codés de la façon suivante :
 0 : pas de symtôme / 1 : symptôme / 99 : non renseigné.
 
-###
+#
 
