@@ -20,7 +20,7 @@ library(tidyverse)
 ```{r, echo=FALSE}
 Intoxications <- read_excel("Intoxications.xls") %>%
   rename("Nausee"=`Nausée ?`,
-         "Vomi" = `Vomissements ?`, 
+         "Vomi" = `Vomissements ?`,
          "Diarrhee" = Diarrée,
          "Eclair" = eclair,
          "Sexe" = sex) %>%
@@ -41,12 +41,12 @@ Intoxications <- read_excel("Intoxications.xls") %>%
 L’étude réalisée ici traite des individus ayant eu une intoxication alimentaire, en Inde en 1990, après une grande manifestation. Pour cela, les habitudes alimentaires sur une cohorte de ces individus ont été répertoriées. Suivant la problématique posée, différentes approches (méthodes) apprises en cours de biostatistique seront mises en avant.
 L’objectif principal sera de construire de potentiels modèle qui permettent d’expliquer et de constater les liens statistiques qui peuvent exister.
 
-```{r, echo=FALSE}
+```{r}
 summary(Intoxications)
 ```
 
 
-# Statistiques descriptives
+#	Statistiques descriptives
 
 Dans ce projet nous allons travailler sur une table de données qui rend compte de l’occurrence d'intoxications alimentaires, suivie sur une cohorte d’individus. Ces individus ont répondu à une enquête sur les habitudes alimentaires.
 Notre table comporte 1094 individus et 11 variables.
