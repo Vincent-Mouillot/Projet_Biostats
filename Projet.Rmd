@@ -14,6 +14,8 @@ knitr::opts_chunk$set(echo = TRUE)
 library(readxl)
 library(tidyverse)
 library(MASS)
+library(ggplot2)
+library(patchwork)
 ```
 
 \newpage
@@ -49,17 +51,12 @@ Viennent ensuite les variables de symptôme : nausée, vomissement, douleur (abd
 
 ```{r, echo=FALSE}
 Intoxications <- Intoxications %>% 
-  select(-id) %>%
   rename("Nausee"=`Nausée ?`,
          "Vomi" = `Vomissements ?`,
          "Diarrhee" = Diarrée,
          "Eclair" = eclair,
          "Sexe" = sex,
          "Age" = age) %>%
-  filter(Boeuf != 9,
-         Oeuf != 9,
-         Eclair != 90,
-         Eau != 9) %>% 
   mutate(Sexe = as.factor(Sexe),
          FactEclair = as.factor(Eclair),
          Nausee = as.factor(Nausee),
@@ -80,16 +77,54 @@ Intoxications <- Intoxications %>%
 
 ```{r, echo=FALSE}
 Intoxications %>% head(5)
-
-Intoxications %>% summary()
 ```
 
 
 #	Statistiques descriptives
 
+```{r}
+Intoxications %>% summary()
+```
+
+```{r}
+g1 <- ggplot() +
+  geom_bar(data = Intoxications,
+           aes(Boeuf),
+           fill = "red")
+g2 <- ggplot() +
+  geom_bar(data = Intoxications,
+           aes(Oeuf),
+           fill = "red")
+g3 <- ggplot() +
+  geom_histogram(data = Intoxications,
+                 aes(Age),
+                 colour = "blue",
+                 fill = "red",
+                 binwidth = 5)
+g4 <- ggplot() + 
+  geom_histogram(data = Intoxications,
+                 aes(Eclair),
+                 colour = "blue",
+                 fill = "red",
+                 binwidth = 1)
+g5 <- ggplot() +
+  geom_bar(data = Intoxications,
+           aes(Sexe),
+           fill = "red")
+```
 
 
 # Regression logistique
+
+
+```{r}
+Intoxications <- Intoxications %>% 
+  filter(Boeuf != 9,
+         Oeuf != 9,
+         Eclair != 90,
+         Eau != 9) 
+```
+
 
 ```{r}
 glm(formula = Symptomes ~ Sexe * Age * Boeuf * Oeuf * Eclair * Eau,
