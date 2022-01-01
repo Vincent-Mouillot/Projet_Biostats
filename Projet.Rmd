@@ -57,8 +57,14 @@ Intoxications <- Intoxications %>%
          "Eclair" = eclair,
          "Sexe" = sex,
          "Age" = age) %>%
-  mutate(Sexe = as.factor(Sexe),
-         FactEclair = as.factor(Eclair),
+  filter(Age != 99,
+         Boeuf != 9,
+         Oeuf != 9,
+         Eclair != 90,
+         Eclair != 80,
+         Eau != 9) %>% 
+  mutate(Symptomes = Nausee + Vomi + Douleur + Diarrhee,
+         Sexe = as.factor(Sexe),
          Nausee = as.factor(Nausee),
          Vomi = as.factor(Vomi),
          Douleur = as.factor(Douleur),
@@ -67,10 +73,7 @@ Intoxications <- Intoxications %>%
          Boeuf = as.factor(Boeuf),
          Oeuf = as.factor(Oeuf),
          Eau = as.factor(Eau),
-         Symptomes = as.factor(if_else((Nausee == 1 |
-                               Vomi == 1 |
-                               Douleur == 1 |
-                               Diarrhee == 1),
+         Malade = as.factor(if_else(Symptomes >= 1,
                              1,
                              0))) 
 ```
@@ -82,77 +85,204 @@ Intoxications %>% head(5)
 
 #	Statistiques descriptives
 
+Comme on a peu d'individus avec un ou des informations manquantes ($\frac{21}{1094} \approx 1.92\%$), on a décidé de les retirer du jeu de données.
+
+
 ```{r}
 Intoxications %>% summary()
 ```
 
-```{r}
+
+
+```{r, echo=FALSE}
 g1 <- ggplot() +
   geom_bar(data = Intoxications,
-           aes(Boeuf),
-           fill = "red")
+           aes(Boeuf,
+                 fill = Malade))
+
 g2 <- ggplot() +
   geom_bar(data = Intoxications,
-           aes(Oeuf),
-           fill = "red")
+           aes(Oeuf,
+                 fill = Malade))
+
 g3 <- ggplot() +
   geom_histogram(data = Intoxications,
-                 aes(Age),
-                 colour = "blue",
-                 fill = "red",
+                 aes(Age,
+                 fill = Malade),
                  binwidth = 5)
+
 g4 <- ggplot() + 
   geom_histogram(data = Intoxications,
-                 aes(Eclair),
-                 colour = "blue",
-                 fill = "red",
+                 aes(Eclair,
+                 fill = Malade),
                  binwidth = 1)
+
 g5 <- ggplot() +
   geom_bar(data = Intoxications,
-           aes(Sexe),
-           fill = "red")
+           aes(Sexe,
+               fill = Malade))
+
+
+(g5 | g1 | g2) / 
+  g3 /
+  g4 + 
+  plot_layout(guides = 'collect')
+```
+
+
+```{r}
+
+g6 <- ggplot() + 
+  geom_boxplot(data = Intoxications,
+               aes(x = Malade,
+                   y = Age,
+                   fill = Malade))
+
+g7 <- ggplot() + 
+  geom_boxplot(data = Intoxications,
+               aes(x = Malade,
+                   y = Eclair,
+                   fill = Malade))
+
+(g6 |g7) + 
+  plot_layout(guides = 'collect')
+```
+
+
+```{r}
+Intoxications <- Intoxications %>% 
+  mutate(id = 1)
+
+g8 <- ggplot() +
+  geom_bar(data = Intoxications,
+           aes(id,
+               fill = as.factor(Symptomes))) +
+  guides(fill=guide_legend(title = "Symptomes"))
+
+g8
 ```
 
 
 # Regression logistique
 
 
-```{r}
-Intoxications <- Intoxications %>% 
-  filter(Boeuf != 9,
-         Oeuf != 9,
-         Eclair != 90,
-         Eau != 9) 
-```
+
 
 
 ```{r}
-glm(formula = Symptomes ~ Sexe * Age * Boeuf * Oeuf * Eclair * Eau,
-    family = "binomial", 
-    data = Intoxications)
-```
-
-```{r}
-glm(formula = Symptomes ~ Sexe + Age + Boeuf + Oeuf + Eclair + Eau,
-    family = "binomial", 
-    data = Intoxications)
-```
-
-```{r}
-stepAIC(object = glm(formula = Symptomes ~ Sexe * Age * Boeuf * Oeuf * Eclair,
+stepAIC(object = glm(formula = Malade ~ Sexe * Eau * Boeuf * Oeuf * Age * Eclair,
     family = "binomial", 
     data = Intoxications),
     direction = "backward")
 ```
 
+Méthode backaward pas adapté car trop de cas particulier et pas d'individus respectant ceux-ci.
+
 ```{r}
-g <- glm(formula = Symptomes ~ 1,
+g <- glm(formula = Malade ~ 1,
     family = "binomial", 
     data = Intoxications)
 
-stepAIC(object = g,
+fitforw <- stepAIC(object = g,
     direction = "forward",
     scope = list(lower = g,
-                 upper = ~Sexe * Age * Boeuf * Oeuf * Eclair * Eau))
+                 upper = ~Sexe * Age * Boeuf * Oeuf * Eau + Eclair))
+
 ```
+
+
+```{r}
+summary(fitforw)
+```
+
+
+# Regression polytomique ordonnée
+
+```{r, echo=FALSE}
+g1 <- ggplot() +
+  geom_bar(data = Intoxications,
+           aes(Boeuf, fill = as.factor(Symptomes)),
+           position = "dodge") +
+  guides(fill=guide_legend(title="Symptomes"))
+
+g2 <- ggplot() +
+  geom_bar(data = Intoxications,
+           aes(Oeuf, fill = as.factor(Symptomes)),
+           position = "dodge") +
+  guides(fill=guide_legend(title="Symptomes"))
+
+g3 <- ggplot() +
+  geom_histogram(data = Intoxications,
+                 aes(Age, fill = as.factor(Symptomes)),
+                 binwidth = 5) +
+  guides(fill=guide_legend(title="Symptomes"))
+
+g4 <- ggplot() + 
+  geom_histogram(data = Intoxications,
+                 aes(Eclair, fill = as.factor(Symptomes)),
+                 binwidth = 1) +
+  guides(fill=guide_legend(title="Symptomes"))
+
+g5 <- ggplot() +
+  geom_bar(data = Intoxications,
+           aes(Sexe, fill = as.factor(Symptomes)),
+           position = "dodge") +
+  guides(fill=guide_legend(title="Symptomes"))
+
+(g5 | g1 | g2 ) / 
+  ((g4 / g3)) + 
+  plot_layout(guides = 'collect')
+```
+
+```{r, echo=FALSE}
+Intoxications <- Intoxications %>% 
+  mutate(Symptomes = case_when(
+    Symptomes == 0 ~ "Sain",
+    Symptomes %in% c(1, 2) ~ "Peu malade",
+    Symptomes %in% c(3, 4) ~ "Très malade",
+    TRUE ~ ""
+  ))
+
+g1 <- ggplot() +
+  geom_bar(data = Intoxications,
+           aes(Boeuf, fill = as.factor(Symptomes)),
+           position = "dodge") +
+  guides(fill=guide_legend(title="Symptomes"))
+
+g2 <- ggplot() +
+  geom_bar(data = Intoxications,
+           aes(Oeuf, fill = as.factor(Symptomes)),
+           position = "dodge") +
+  guides(fill=guide_legend(title="Symptomes"))
+
+g3 <- ggplot() +
+  geom_histogram(data = Intoxications,
+                 aes(Age, fill = as.factor(Symptomes)),
+                 binwidth = 5) +
+  guides(fill=guide_legend(title="Symptomes"))
+
+g4 <- ggplot() + 
+  geom_histogram(data = Intoxications,
+                 aes(Eclair, fill = as.factor(Symptomes)),
+                 binwidth = 1) +
+  guides(fill=guide_legend(title="Symptomes"))
+
+g5 <- ggplot() +
+  geom_bar(data = Intoxications,
+           aes(Sexe, fill = as.factor(Symptomes)),
+           position = "dodge") +
+  guides(fill=guide_legend(title="Symptomes"))
+
+(g5 | g1 | g2 ) / 
+  ((g4 / g3)) + 
+  plot_layout(guides = 'collect')
+```
+
+
+Changer ordre levels "sains, "peu malade" et "tres malade" avec sain en reference
+
+
+
+
+
 
