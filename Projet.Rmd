@@ -16,6 +16,7 @@ library(tidyverse)
 library(MASS)
 library(ggplot2)
 library(patchwork)
+library(modelsummary)
 ```
 
 \newpage
@@ -82,7 +83,7 @@ Intoxications <- Intoxications %>%
 Intoxications %>% head(5)
 ```
 
-
+\newpage
 #	Statistiques descriptives
 
 Comme on a peu d'individus avec un ou des informations manquantes ($\frac{21}{1094} \approx 1.92\%$), on a décidé de les retirer du jeu de données.
@@ -130,7 +131,7 @@ g5 <- ggplot() +
 ```
 
 
-```{r}
+```{r, echo=FALSE, fig.height=4}
 
 g6 <- ggplot() + 
   geom_boxplot(data = Intoxications,
@@ -149,7 +150,7 @@ g7 <- ggplot() +
 ```
 
 
-```{r}
+```{r, echo=FALSE, fig.height=2}
 Intoxications <- Intoxications %>% 
   mutate(id = 1)
 
@@ -162,23 +163,28 @@ g8 <- ggplot() +
 g8
 ```
 
-
+\newpage
 # Regression logistique
 
 
 
 
 
-```{r}
-stepAIC(object = glm(formula = Malade ~ Sexe * Eau * Boeuf * Oeuf * Age * Eclair,
+```{r,results='hide', warning=FALSE}
+f <- stepAIC(object = glm(formula = Malade ~ Sexe * Eau * Boeuf * Oeuf * Age * Eclair,
     family = "binomial", 
     data = Intoxications),
     direction = "backward")
 ```
 
+```{r}
+f$converged
+```
+
+
 Méthode backaward pas adapté car trop de cas particulier et pas d'individus respectant ceux-ci.
 
-```{r}
+```{r, results='hide'}
 g <- glm(formula = Malade ~ 1,
     family = "binomial", 
     data = Intoxications)
@@ -186,7 +192,7 @@ g <- glm(formula = Malade ~ 1,
 fitforw <- stepAIC(object = g,
     direction = "forward",
     scope = list(lower = g,
-                 upper = ~Sexe * Age * Boeuf * Oeuf * Eau + Eclair))
+                 upper = ~ Sexe * Age * Boeuf * Oeuf * Eau * Eclair))
 
 ```
 
@@ -195,7 +201,11 @@ fitforw <- stepAIC(object = g,
 summary(fitforw)
 ```
 
+```{r}
+confint(fitforw)
+```
 
+\newpage
 # Regression polytomique ordonnée
 
 ```{r, echo=FALSE}
@@ -234,42 +244,48 @@ g5 <- ggplot() +
   plot_layout(guides = 'collect')
 ```
 
+
+
 ```{r, echo=FALSE}
 Intoxications <- Intoxications %>% 
   mutate(Symptomes = case_when(
     Symptomes == 0 ~ "Sain",
     Symptomes %in% c(1, 2) ~ "Peu malade",
-    Symptomes %in% c(3, 4) ~ "Très malade",
+    Symptomes %in% c(3, 4) ~ "Tres malade",
     TRUE ~ ""
   ))
 
+Intoxications$Symptomes <- Intoxications$Symptomes %>% 
+  as.factor() %>% 
+  ordered(c("Sain", "Peu malade", "Tres malade"))
+
 g1 <- ggplot() +
   geom_bar(data = Intoxications,
-           aes(Boeuf, fill = as.factor(Symptomes)),
+           aes(Boeuf, fill = Symptomes),
            position = "dodge") +
   guides(fill=guide_legend(title="Symptomes"))
 
 g2 <- ggplot() +
   geom_bar(data = Intoxications,
-           aes(Oeuf, fill = as.factor(Symptomes)),
+           aes(Oeuf, fill = Symptomes),
            position = "dodge") +
   guides(fill=guide_legend(title="Symptomes"))
 
 g3 <- ggplot() +
   geom_histogram(data = Intoxications,
-                 aes(Age, fill = as.factor(Symptomes)),
+                 aes(Age, fill = Symptomes),
                  binwidth = 5) +
   guides(fill=guide_legend(title="Symptomes"))
 
 g4 <- ggplot() + 
   geom_histogram(data = Intoxications,
-                 aes(Eclair, fill = as.factor(Symptomes)),
+                 aes(Eclair, fill = Symptomes),
                  binwidth = 1) +
   guides(fill=guide_legend(title="Symptomes"))
 
 g5 <- ggplot() +
   geom_bar(data = Intoxications,
-           aes(Sexe, fill = as.factor(Symptomes)),
+           aes(Sexe, fill = Symptomes),
            position = "dodge") +
   guides(fill=guide_legend(title="Symptomes"))
 
@@ -279,8 +295,26 @@ g5 <- ggplot() +
 ```
 
 
-Changer ordre levels "sains, "peu malade" et "tres malade" avec sain en reference
+```{r, results='hide'}
+g <- polr(Symptomes ~ 1, data = Intoxications)
 
+fitforw <- stepAIC(object = g,
+    direction = "forward",
+    scope = list(lower = g,
+                 upper = ~Sexe * Age * Boeuf * Oeuf * Eau * Eclair))
+```
+
+
+```{r}
+summary(fitforw)
+```
+
+
+
+
+```{r}
+confint(fitforw)
+```
 
 
 
