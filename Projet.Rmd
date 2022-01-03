@@ -312,8 +312,18 @@ summary(fitforw)
 
 
 
-```{r}
-confint(fitforw)
+```{r, echo=FALSE, results='hide'}
+CI <- as.data.frame(confint(fitforw))
+```
+
+```{r, echo=FALSE}
+ggplot() +
+  geom_errorbar(data = CI,
+                aes(x = row.names(CI),
+                    ymin = CI[,1],
+                    ymax = CI[,2],
+                    colour = row.names(CI))) +
+  xlab("Covariables")
 ```
 
 
