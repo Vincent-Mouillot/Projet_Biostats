@@ -1,5 +1,5 @@
 ---
-title: "Projet"
+title: "Etude de cas d'intoxications alimentaires en Inde en 1990"
 author: "Vincent Mouillot  & Inès Rouached"
 date: "20/12/2021"
 output: 
@@ -201,8 +201,20 @@ fitforw <- stepAIC(object = g,
 summary(fitforw)
 ```
 
-```{r}
-confint(fitforw)
+
+```{r, echo=FALSE, results='hide'}
+CI <- as.data.frame(confint(fitforw))
+```
+
+```{r, echo=FALSE}
+ggplot() +
+  geom_errorbar(data = CI,
+                aes(x = row.names(CI),
+                    ymin = CI[,1],
+                    ymax = CI[,2],
+                    colour = row.names(CI))) +
+  xlab("Covariables") +
+  theme(legend.position = "none", axis.text.x = element_text(angle = 45, vjust = 0.7))
 ```
 
 \newpage
@@ -323,7 +335,8 @@ ggplot() +
                     ymin = CI[,1],
                     ymax = CI[,2],
                     colour = row.names(CI))) +
-  xlab("Covariables")
+  xlab("Covariables") +
+  theme(legend.position = "none", axis.text.x = element_text(angle = 45, vjust = 0.7))
 ```
 
 
